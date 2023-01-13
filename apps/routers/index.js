@@ -1,48 +1,40 @@
-const { getBook } = require("../controllers/getBook");
+const { createBook, getBooks, getBook, updateBook, deleteBook } = require("../controllers");
 
 const Routers = (server) => {
 	server.route({
 		method: "GET",
 		path: "/",
-		handler: getBook,
+		handler: getBooks,
 	});
 
 	server.route({
 		method: "POST",
-		path: "/api/note",
-		handler: async (request, h) => {
-			let info = request.payload;
-			console.log(info);
-			return info;
-		},
+		path: "/books",
+		handler: createBook,
 	});
 
 	server.route({
 		method: "GET",
-		path: "/api/notes",
-		handler: async (request, h) => {
-			let params = request.query;
-			return h.response(params);
-		},
+		path: "/books",
+		handler: getBooks,
+	});
+
+	server.route({
+		method: "GET",
+		path: "/books/{id}",
+		handler: getBook,
 	});
 
 	server.route({
 		method: "PUT",
-		path: "/api/note/{id}",
-		handler: async (request, h) => {
-			let params = request.params.id;
-			let info = request.payload;
-			return h.response(info);
-		},
+		path: "/books/{id}",
+		handler: updateBook,
 	});
 
 	server.route({
 		method: "DELETE",
-		path: "/api/note/{id}",
-		handler: async (request, h) => {
-			let params = request.params.id;
-			return h.response(params);
-		},
+		path: "/books/{id}",
+		handler: deleteBook,
 	});
 	return server;
 };
