@@ -4,7 +4,10 @@ const Routers = (server) => {
 	server.route({
 		method: "GET",
 		path: "/",
-		handler: getBooks,
+		handler: (req, res) => {
+			const message = `Welcome to Dicoding Bookshelf API`;
+			return res.response(message).code(200);
+		},
 	});
 
 	server.route({

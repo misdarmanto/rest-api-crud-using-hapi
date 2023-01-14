@@ -13,9 +13,23 @@ const createBook = (req, res) => {
 		return res.response(response).code(400);
 	}
 
+	if (body.readPage > body.pageCount) {
+		response = {
+			status: "fail",
+			message: "Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount",
+		};
+		return res.response(response).code(400);
+	}
+
 	try {
 		Object.assign(BookModel, body);
 		const data = { ...getDefaultModel(), ...BookModel };
+
+		if (body.readPage === body.pageCount) {
+			data.finished = true;
+			data.reading = true;
+		}
+
 		BooksDB.push(data);
 		response = {
 			bookId: data.id,
@@ -34,6 +48,51 @@ const createBook = (req, res) => {
 
 const getBooks = (req, res) => {
 	try {
+		if ("reading" in req.query) {
+			let data = [];
+			if (+req.query.reading === 1) {
+				data = BooksDB.filter((book) => book.reading === true);
+			}
+
+			if (+req.query.reading === 0) {
+				data = BooksDB.filter((book) => book.reading === false);
+			}
+
+			response = {
+				status: "success",
+				data: data,
+			};
+			return res.response(response).code(200);
+		}
+
+		if ("finished" in req.query) {
+			let data = [];
+			if (+req.query.finished === 1) {
+				data = BooksDB.filter((book) => book.finished === true);
+			}
+
+			if (+req.query.finished === 0) {
+				data = BooksDB.filter((book) => book.finished === false);
+			}
+
+			response = {
+				status: "success",
+				data: data,
+			};
+			return res.response(response).code(200);
+		}
+
+		if ("name" in req.query) {
+			response = {
+				status: "success",
+				data: BooksDB.filter((book) => {
+					const bookName = req.query.name.toUpperCase();
+					if (book.name.toUpperCase().search(bookName) !== -1) return book;
+				}),
+			};
+			return res.response(response).code(200);
+		}
+
 		response = {
 			status: "success",
 			data: BooksDB.map((book) => ({
@@ -109,6 +168,8 @@ const updateBook = (req, res) => {
 			return res.response(response).code(404);
 		}
 
+		const updatedAt = new Date().toISOString();
+		body.updatedAt = updatedAt;
 		BooksDB[bookId] = { ...BooksDB[bookId], ...body };
 
 		const response = {
