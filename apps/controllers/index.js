@@ -6,7 +6,7 @@ let BooksDB = [];
 const createBook = (req, res) => {
 	const body = req.payload;
 	if (!("name" in body)) {
-		response = {
+		const response = {
 			status: "fail",
 			message: "Gagal menambahkan buku. Mohon isi nama buku",
 		};
@@ -14,7 +14,7 @@ const createBook = (req, res) => {
 	}
 
 	if (body.readPage > body.pageCount) {
-		response = {
+		const response = {
 			status: "fail",
 			message: "Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount",
 		};
@@ -31,7 +31,7 @@ const createBook = (req, res) => {
 		}
 
 		BooksDB.push(data);
-		response = {
+		const response = {
 			bookId: data.id,
 			status: "success",
 			message: "Buku berhasil ditambahkan",
@@ -58,7 +58,7 @@ const getBooks = (req, res) => {
 				data = BooksDB.filter((book) => book.reading === false);
 			}
 
-			response = {
+			const response = {
 				status: "success",
 				data: data,
 			};
@@ -75,7 +75,7 @@ const getBooks = (req, res) => {
 				data = BooksDB.filter((book) => book.finished === false);
 			}
 
-			response = {
+			const response = {
 				status: "success",
 				data: data,
 			};
@@ -83,7 +83,7 @@ const getBooks = (req, res) => {
 		}
 
 		if ("name" in req.query) {
-			response = {
+			const response = {
 				status: "success",
 				data: BooksDB.filter((book) => {
 					const bookName = req.query.name.toUpperCase();
@@ -93,7 +93,7 @@ const getBooks = (req, res) => {
 			return res.response(response).code(200);
 		}
 
-		response = {
+		const response = {
 			status: "success",
 			data: BooksDB.map((book) => ({
 				id: book.id,
@@ -140,7 +140,7 @@ const getBook = (req, res) => {
 const updateBook = (req, res) => {
 	const body = req.payload;
 	if (!("name" in body)) {
-		response = {
+		const response = {
 			status: "fail",
 			message: "Gagal memperbarui buku. Mohon isi nama buku",
 		};
