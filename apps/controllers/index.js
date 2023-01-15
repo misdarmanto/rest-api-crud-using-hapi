@@ -16,7 +16,7 @@ const createBook = (req, res) => {
 	if (body.readPage > body.pageCount) {
 		const response = {
 			status: "fail",
-			message: "Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount",
+			message: "Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount",
 		};
 		return res.response(response).code(400);
 	}
@@ -32,15 +32,15 @@ const createBook = (req, res) => {
 
 		BooksDB.push(data);
 		const response = {
-			bookId: data.id,
 			status: "success",
 			message: "Buku berhasil ditambahkan",
+			data: { bookId: data.id },
 		};
-		return res.response(response).code(200);
+		return res.response(response).code(201);
 	} catch (error) {
 		const response = {
 			status: "error",
-			message: "Buku gagal ditambahkan! " + error.message,
+			message: "Buku gagal ditambahkan",
 		};
 		return res.response(response).code(500);
 	}
@@ -60,7 +60,7 @@ const getBooks = (req, res) => {
 
 			const response = {
 				status: "success",
-				data: data,
+				data: { books: data },
 			};
 			return res.response(response).code(200);
 		}
@@ -77,7 +77,7 @@ const getBooks = (req, res) => {
 
 			const response = {
 				status: "success",
-				data: data,
+				data: { books: data },
 			};
 			return res.response(response).code(200);
 		}
@@ -85,27 +85,30 @@ const getBooks = (req, res) => {
 		if ("name" in req.query) {
 			const response = {
 				status: "success",
-				data: BooksDB.filter((book) => {
-					const bookName = req.query.name.toUpperCase();
-					if (book.name.toUpperCase().search(bookName) !== -1) return book;
-				}),
+				data: {
+					books: BooksDB.filter((book) => {
+						const bookName = req.query.name.toUpperCase();
+						if (book.name.toUpperCase().search(bookName) !== -1) return book;
+					}),
+				},
 			};
 			return res.response(response).code(200);
 		}
 
+		const responseData = BooksDB.map((book) => {
+			return { id: book.id, name: book.name, publisher: book.publisher };
+		});
+
 		const response = {
 			status: "success",
-			data: BooksDB.map((book) => ({
-				id: book.id,
-				name: book.name,
-				publisher: book.publisher,
-			})),
+			data: { books: responseData },
 		};
+
 		return res.response(response).code(200);
 	} catch (error) {
 		const response = {
 			status: "error",
-			message: "gagal mengambil buku !" + error.message,
+			message: "gagal mengambil buku",
 		};
 		return res.response(response).code(500);
 	}
@@ -113,9 +116,9 @@ const getBooks = (req, res) => {
 
 const getBook = (req, res) => {
 	try {
-		const book = BooksDB.filter((book) => book.id === req.params.id);
+		const book = BooksDB.find((book) => book.id === req.params.id);
 
-		if (book.length === 0) {
+		if (!book) {
 			const response = {
 				status: "fail",
 				message: "Buku tidak ditemukan",
@@ -131,7 +134,7 @@ const getBook = (req, res) => {
 	} catch (error) {
 		const response = {
 			status: "error",
-			message: "gagal mengambil buku! " + error.message,
+			message: "gagal mengambil buku",
 		};
 		return res.response(response).code(500);
 	}
@@ -180,7 +183,7 @@ const updateBook = (req, res) => {
 	} catch (error) {
 		const response = {
 			status: "error",
-			message: "gagal memperbaharui buku!" + error.message,
+			message: "gagal memperbaharui buku",
 		};
 		return res.response(response).code(500);
 	}
@@ -207,7 +210,7 @@ const deleteBook = (req, res) => {
 	} catch (error) {
 		const response = {
 			status: "error",
-			message: "gagal menghapus buku! " + error.message,
+			message: "gagal menghapus buku",
 		};
 		return res.response(response).code(500);
 	}
