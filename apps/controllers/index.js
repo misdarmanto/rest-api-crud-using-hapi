@@ -49,47 +49,49 @@ const createBook = (req, res) => {
 const getBooks = (req, res) => {
 	try {
 		if ("reading" in req.query) {
-			let data = [];
+			let booksWithReadingStatus = [];
 			if (+req.query.reading === 1) {
-				data = BooksDB.filter((book) => book.reading === true);
+				booksWithReadingStatus = BooksDB.filter((book) => book.reading === true);
 			}
 
 			if (+req.query.reading === 0) {
-				data = BooksDB.filter((book) => book.reading === false);
+				booksWithReadingStatus = BooksDB.filter((book) => book.reading === false);
 			}
 
 			const response = {
 				status: "success",
-				data: { books: data },
+				data: { books: booksWithReadingStatus },
 			};
 			return res.response(response).code(200);
 		}
 
 		if ("finished" in req.query) {
-			let data = [];
+			let booksWithFinishReading = [];
 			if (+req.query.finished === 1) {
-				data = BooksDB.filter((book) => book.finished === true);
+				booksWithFinishReading = BooksDB.filter((book) => book.finished === true);
 			}
 
 			if (+req.query.finished === 0) {
-				data = BooksDB.filter((book) => book.finished === false);
+				booksWithFinishReading = BooksDB.filter((book) => book.finished === false);
 			}
 
 			const response = {
 				status: "success",
-				data: { books: data },
+				data: { books: booksWithFinishReading },
 			};
 			return res.response(response).code(200);
 		}
 
 		if ("name" in req.query) {
+			const booksWithSpecificName = BooksDB.filter((book) => {
+				const bookName = req.query.name.toUpperCase();
+				if (book.name.toUpperCase().search(bookName) !== -1) return book;
+			});
+
 			const response = {
 				status: "success",
 				data: {
-					books: BooksDB.filter((book) => {
-						const bookName = req.query.name.toUpperCase();
-						if (book.name.toUpperCase().search(bookName) !== -1) return book;
-					}),
+					books: booksWithSpecificName,
 				},
 			};
 			return res.response(response).code(200);
@@ -118,7 +120,7 @@ const getBook = (req, res) => {
 	try {
 		const book = BooksDB.find((book) => book.id === req.params.id);
 
-		if (!book) {
+		if (book === undefined) {
 			const response = {
 				status: "fail",
 				message: "Buku tidak ditemukan",
@@ -128,7 +130,7 @@ const getBook = (req, res) => {
 
 		const response = {
 			status: "success",
-			data: { book },
+			data: { book: book },
 		};
 		return res.response(response).code(200);
 	} catch (error) {
